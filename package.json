@@ -1,0 +1,23 @@
+{
+  "name": "whatsapp-bot-example",
+  "version": "1.0.0",
+  "description": "An example of how to interact with the Whatsapp oficial API ",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/antoniosmgatto/whatsapp-bot.git"
+  },
+  "keywords": [
+    "whatsapp",
+    "bot"
+  ],
+  "author": "Antonio Gatto",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/antoniosmgatto/whatsapp-bot/issues"
+  },
+  "homepage": "https://github.com/antoniosmgatto/whatsapp-bot#readme"
+}
