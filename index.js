@@ -1,3 +1,4 @@
+import "dotenv/config";
 import express from "express";
 import axios from "axios";
 
@@ -11,7 +12,7 @@ const {
 } = process.env;
 
 app.post("/whatsapp/webhook", async (req, res) => {
-  // log incoming messages
+  // log incoming messages3
   console.log("Incoming webhook message:", JSON.stringify(req.body, null, 2));
 
   // check if the webhook request contains a message
