@@ -28,7 +28,8 @@ app.post("/whatsapp/webhook", async (req, res) => {
     // send a reply message as per the docs here https://developers.facebook.com/docs/whatsapp/cloud-api/reference/messages
     await axios({
       method: "POST",
-      url: `https://graph.facebook.com/v18.0/${business_phone_number_id}/messages`,
+      url: `https://graph.facebook.com/v20.0/${business_phone_number_id}/messages`,
+      content_type: "application/json",
       headers: {
         Authorization: `Bearer ${WHATSAPP_GRAPH_API_TOKEN}`,
       },
@@ -45,7 +46,7 @@ app.post("/whatsapp/webhook", async (req, res) => {
     // mark incoming message as read
     await axios({
       method: "POST",
-      url: `https://graph.facebook.com/v18.0/${business_phone_number_id}/messages`,
+      url: `https://graph.facebook.com/v20.0/${business_phone_number_id}/messages`,
       headers: {
         Authorization: `Bearer ${WHATSAPP_GRAPH_API_TOKEN}`,
       },
