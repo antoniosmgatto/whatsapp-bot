@@ -59,29 +59,10 @@ app.post("/whatsapp/webhook", async (req, res) => {
       });
     }
 
-    console.log("Contact", contact);
     const contactName = contact?.profile?.name || `Customer`;
 
     // send the incoming message to Discord
     discordChannel.send(`${contactName} escreveu: "${message.text.body}"`);
-
-    // send a reply message as per the docs here https://developers.facebook.com/docs/whatsapp/cloud-api/reference/messages
-    await axios({
-      method: "POST",
-      url: `https://graph.facebook.com/v20.0/${business_phone_number_id}/messages`,
-      content_type: "application/json",
-      headers: {
-        Authorization: `Bearer ${WHATSAPP_GRAPH_API_TOKEN}`,
-      },
-      data: {
-        messaging_product: "whatsapp",
-        to: fromCellphone,
-        text: { body: "Echo: " + message.text.body },
-        context: {
-          message_id: message.id, // shows the message as a reply to the original user message
-        },
-      },
-    });
 
     // mark incoming message as read
     await axios({
