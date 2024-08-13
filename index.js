@@ -1,15 +1,34 @@
 import "dotenv/config";
 import express from "express";
 import axios from "axios";
+import {
+  Client as DiscordClient,
+  GatewayIntentBits,
+  Events,
+  REST as DiscordREST,
+  Routes,
+  ChannelType,
+} from "discord.js";
 
 const app = express();
 app.use(express.json());
 
 const {
+  DISCORD_TOKEN,
   WHATSAPP_GRAPH_API_TOKEN,
   WHATSAPP_WEBHOOK_VERIFY_TOKEN,
   PORT = 3000,
 } = process.env;
+
+const discordClient = new DiscordClient({
+  intents: [GatewayIntentBits.Guilds],
+});
+
+discordClient.once(Events.ClientReady, () => {
+  console.info(`Logged in as ${discordClient.user.tag}`);
+});
+
+discordClient.login(DISCORD_TOKEN);
 
 app.post("/whatsapp/webhook", async (req, res) => {
   // log incoming messages3
@@ -18,12 +37,33 @@ app.post("/whatsapp/webhook", async (req, res) => {
   // check if the webhook request contains a message
   // details on WhatsApp text message payload: https://developers.facebook.com/docs/whatsapp/cloud-api/webhooks/payload-examples#text-messages
   const message = req.body.entry?.[0]?.changes[0]?.value?.messages?.[0];
+  const contact = req.body.entry?.[0]?.changes[0]?.value?.contacts?.[0];
 
   // check if the incoming message contains text
   if (message?.type === "text") {
     // extract the business number to send the reply from it
     const business_phone_number_id =
       req.body.entry?.[0].changes?.[0].value?.metadata?.phone_number_id;
+
+    const fromCellphone = message.from;
+    let discordChannel = discordClient.channels.cache.find(
+      (channel) => channel.name === fromCellphone,
+    );
+
+    if (!discordChannel) {
+      const discordGuild = discordClient.guilds.cache.first();
+
+      discordChannel = await discordGuild.channels.create({
+        name: fromCellphone,
+        type: ChannelType.GuildText,
+      });
+    }
+
+    console.log("Contact", contact);
+    const contactName = contact?.profile?.name || `Customer`;
+
+    // send the incoming message to Discord
+    discordChannel.send(`${contactName} escreveu: "${message.text.body}"`);
 
     // send a reply message as per the docs here https://developers.facebook.com/docs/whatsapp/cloud-api/reference/messages
     await axios({
@@ -35,7 +75,7 @@ app.post("/whatsapp/webhook", async (req, res) => {
       },
       data: {
         messaging_product: "whatsapp",
-        to: message.from,
+        to: fromCellphone,
         text: { body: "Echo: " + message.text.body },
         context: {
           message_id: message.id, // shows the message as a reply to the original user message
